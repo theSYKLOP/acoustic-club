@@ -1,1 +1,0 @@
-import{E as e,x as o,D as i}from"#entry";const c=e((t,a)=>{const s=o();if(!["/login","/register","/"].includes(t.path)&&!(s.isAuthenticated||s.hasValidSession()))return i("/login")});export{c as default};
