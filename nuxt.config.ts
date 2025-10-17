@@ -98,7 +98,8 @@ export default defineNuxtConfig({
 
   // Nitro (serveur)
   nitro: {
-    preset: 'node'
+    preset: 'node',
+    serveStatic: true
   },
 
   // Optimizations
