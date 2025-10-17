@@ -98,8 +98,11 @@ export default defineNuxtConfig({
 
   // Nitro (serveur)
   nitro: {
-    preset: 'node',
-    serveStatic: true
+    preset: 'vercel',
+    serveStatic: true,
+    externals: {
+      inline: ['@prisma/client', '@prisma/client/runtime/library', '.prisma/client', '.prisma']
+    }
   },
 
   // Optimizations
