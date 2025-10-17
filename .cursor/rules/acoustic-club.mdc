@@ -1,0 +1,102 @@
+📐 Project Rules – Acoustic Club
+✅ Style de communication
+
+Réponses en français clair sauf indication contraire.
+
+Explications techniques précises mais accessibles (adaptées au niveau du lecteur).
+
+Toujours justifier les choix techniques (ex. Prisma vs ORM classique, Nuxt UI vs composants custom).
+
+✅ Principes de développement
+
+Privilégier la lisibilité et la modularité du code.
+
+Respecter les standards modernes : ECMAScript 2023, bonnes pratiques Nuxt 4, Prisma, Tailwind.
+
+Optimiser les performances sans sacrifier la maintenabilité (lazy loading, caching, code splitting).
+
+Tests unitaires (Vitest) et tests d’intégration obligatoires pour les fonctions critiques (auth, paiement, attribution de tables).
+
+Respect strict du RGPD (pas de données sensibles en clair).
+
+✅ Gestion des erreurs
+
+Gestion d’erreur robuste côté backend (API Prisma) et frontend (Nuxt 4).
+
+Logger les erreurs avec des messages explicites et contextualisés.
+
+Fournir des fallbacks appropriés (ex : si QR Code échoue → afficher un numéro de commande texte).
+
+Utiliser un middleware global d’erreurs pour centraliser la gestion.
+
+✅ Framework & Stack
+
+Nuxt 4 avec Composition API (pas Options API).
+
+Backend : Prisma + API REST/GraphQL.
+
+Frontend : Nuxt 4 (SSR + PWA ready) + TailwindCSS + Nuxt UI.
+
+DB : PostgreSQL par défaut.
+
+Authentification : JWT avec rôles (admin, serveur, client).
+
+QR Code généré côté serveur (Node).
+
+Support impression tickets (compatibilité imprimantes thermiques).
+
+✅ Architecture et Structure Nuxt 4
+
+Respecter la structure officielle Nuxt :
+
+pages/ → vues principales (auth, dashboard, serveur, client, stats).
+
+components/ → composants spécifiques au projet.
+
+layouts/ → squelettes de pages (default, admin-layout, server-layout).
+
+middleware/ → guards d’authentification/permissions.
+
+composables/ → logique réutilisable (useAuth, useTables, useOrders).
+
+server/api/ → endpoints backend sécurisés (CRUD Prisma).
+
+plugins/ → config globale (tailwind, fonts, notifications).
+
+Utiliser les auto-imports Nuxt (ref, reactive, computed, useRouter, etc.).
+
+Organisation par modules fonctionnels (tables, menus, commandes, clients premium).
+
+✅ Conventions de nommage
+
+Composants Vue : PascalCase → TableCard.vue, MenuList.vue.
+
+Pages : kebab-case → admin-dashboard.vue, table-assign.vue.
+
+Composables : useXxx en camelCase → useAuth.ts, useOrders.ts.
+
+Middleware : kebab-case → auth-guard.ts.
+
+Layouts : kebab-case → admin-layout.vue.
+
+Prisma models : PascalCase singulier → User, Table, Order, Menu, PremiumClient.
+
+✅ Règles spécifiques Tailwind & UI
+
+Nuxt UI est la librairie UI par défaut pour les composants (boutons, inputs, modals, cards).
+
+Utiliser TailwindCSS pour :
+
+Thème global (couleurs, typographie, espacement).
+
+Layouts et responsive design.
+
+Configurer un fichier global.css uniquement pour :
+
+Reset CSS et typographie globale.
+
+Variables globales (classes génériques si besoin).
+
+Couleurs principales définies dans tailwind.config.js (brand-primary, brand-secondary).
+
+Fonts : Euclid Circular (prioritaire) avec fallback Inter.

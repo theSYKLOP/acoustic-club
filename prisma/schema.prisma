@@ -1,0 +1,234 @@
+// Prisma Schema pour Acoustic Club
+// Base de données PostgreSQL avec modèles pour gestion restaurant/boîte
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Modèle User - Utilisateurs du système (Admin, Serveur, Client)
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String   // Hash bcrypt
+  name      String
+  role      UserRole @default(CLIENT)
+  phone     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  orders              Order[]
+  premiumProfile      PremiumClient?
+  tableAssignments    TableAssignment[] @relation("ClientAssignments")
+  serverAssignments   TableAssignment[] @relation("ServerAssignments")
+
+  @@index([email])
+}
+
+enum UserRole {
+  ADMIN
+  SERVEUR
+  CLIENT
+  PREMIUM
+}
+
+// Modèle Table - Tables du restaurant/boîte
+model Table {
+  id          String      @id @default(cuid())
+  number      Int         @unique
+  capacity    Int
+  status      TableStatus @default(LIBRE)
+  location    String?     // Zone (VIP, terrasse, intérieur)
+  qrCode      String?     // QR Code unique pour la table
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  // Relations
+  assignments TableAssignment[]
+  orders      Order[]
+
+  @@index([status])
+}
+
+enum TableStatus {
+  LIBRE
+  OCCUPEE
+  RESERVEE
+  HORS_SERVICE
+}
+
+// Modèle TableAssignment - Attribution de table à un client
+model TableAssignment {
+  id        String   @id @default(cuid())
+  tableId   String
+  userId    String?  // Client (peut être null pour client sans compte)
+  serverId  String   // Serveur qui a fait l'attribution
+  startTime DateTime @default(now())
+  endTime   DateTime?
+  guestName String?  // Nom du client si pas de compte
+  guestCount Int     @default(1)
+
+  // Relations
+  table  Table @relation(fields: [tableId], references: [id], onDelete: Cascade)
+  user   User? @relation("ClientAssignments", fields: [userId], references: [id], onDelete: SetNull)
+  server User  @relation("ServerAssignments", fields: [serverId], references: [id], onDelete: Cascade)
+
+  @@index([tableId])
+  @@index([userId])
+  @@index([serverId])
+}
+
+// Modèle Menu - Items du menu
+model Menu {
+  id          String     @id @default(cuid())
+  name        String
+  description String?
+  price       Float
+  category    MenuCategory
+  image       String?
+  available   Boolean    @default(true)
+  prepTime    Int?       // Temps de préparation en minutes
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  // Relations
+  orderItems OrderItem[]
+
+  @@index([category])
+  @@index([available])
+}
+
+enum MenuCategory {
+  ENTREE
+  PLAT
+  DESSERT
+  BOISSON
+  ALCOOL
+  COCKTAIL
+  SNACK
+}
+
+// Modèle Order - Commandes
+model Order {
+  id          String      @id @default(cuid())
+  orderNumber String      @unique // Numéro de commande unique
+  userId      String?
+  tableId     String
+  status      OrderStatus @default(EN_ATTENTE)
+  totalAmount Float       @default(0)
+  qrCode      String?     // QR Code du ticket
+  notes       String?
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  // Relations
+  user       User?       @relation(fields: [userId], references: [id], onDelete: SetNull)
+  table      Table       @relation(fields: [tableId], references: [id], onDelete: Cascade)
+  items      OrderItem[]
+  payment    Payment?
+
+  @@index([orderNumber])
+  @@index([userId])
+  @@index([tableId])
+  @@index([status])
+}
+
+enum OrderStatus {
+  EN_ATTENTE
+  EN_PREPARATION
+  PRET
+  SERVI
+  ANNULE
+  PAYE
+}
+
+// Modèle OrderItem - Items d'une commande
+model OrderItem {
+  id       String @id @default(cuid())
+  orderId  String
+  menuId   String
+  quantity Int    @default(1)
+  price    Float  // Prix au moment de la commande
+  notes    String?
+
+  // Relations
+  order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  menu  Menu  @relation(fields: [menuId], references: [id], onDelete: Cascade)
+
+  @@index([orderId])
+  @@index([menuId])
+}
+
+// Modèle Payment - Paiements
+model Payment {
+  id            String        @id @default(cuid())
+  orderId       String        @unique
+  amount        Float
+  method        PaymentMethod
+  status        PaymentStatus @default(EN_ATTENTE)
+  transactionId String?
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  // Relations
+  order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  @@index([status])
+}
+
+enum PaymentMethod {
+  ESPECE
+  CARTE
+  MOBILE
+  CHEQUE
+}
+
+enum PaymentStatus {
+  EN_ATTENTE
+  VALIDE
+  REFUSE
+  REMBOURSE
+}
+
+// Modèle PremiumClient - Clients Premium (fidélisation)
+model PremiumClient {
+  id              String   @id @default(cuid())
+  userId          String   @unique
+  points          Int      @default(0)
+  tier            PremiumTier @default(BRONZE)
+  discountPercent Float    @default(0)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([tier])
+}
+
+enum PremiumTier {
+  BRONZE
+  SILVER
+  GOLD
+  PLATINUM
+}
+
+// Modèle Statistics - Statistiques globales
+model Statistics {
+  id              String   @id @default(cuid())
+  date            DateTime @unique @default(now())
+  totalOrders     Int      @default(0)
+  totalRevenue    Float    @default(0)
+  tablesOccupied  Int      @default(0)
+  averageOrderValue Float  @default(0)
+  premiumClients  Int      @default(0)
+  createdAt       DateTime @default(now())
+
+  @@index([date])
+}
+
