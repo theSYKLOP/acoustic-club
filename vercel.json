@@ -3,7 +3,6 @@
   "devCommand": "npm run dev",
   "installCommand": "npm install",
   "framework": "nuxtjs",
-  "nodeVersion": "20.x",
   "routes": [
     {
       "src": "/(.*)",
