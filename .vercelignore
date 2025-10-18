@@ -1,10 +1,6 @@
 .nuxt
-.output
 .env
 .env.local
 .DS_Store
 *.log
 .cache
-dist
-!node_modules/@prisma/client/**
-!node_modules/.prisma/**
