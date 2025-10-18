@@ -1,5 +1,6 @@
 .nuxt
-.env
+node_modules/.prisma
+node_modules/@prisma
 .env.local
 .DS_Store
 *.log
