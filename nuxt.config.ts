@@ -98,7 +98,29 @@ export default defineNuxtConfig({
 
   // Nitro (serveur)
   nitro: {
-    preset: 'vercel'
+    preset: 'vercel',
+    serveStatic: true,
+    experimental: {
+      openAPI: true
+    },
+    esbuild: {
+      options: {
+        target: 'esnext'
+      }
+    },
+    rollupConfig: {
+      external: [],
+      output: {
+        format: 'esm'
+      }
+    },
+    moduleSideEffects: [
+      '@prisma/client',
+      '.prisma/client'
+    ],
+    alias: {
+      '.prisma/client/index-browser': '.prisma/client/index.js'
+    }
   },
 
   // Optimizations

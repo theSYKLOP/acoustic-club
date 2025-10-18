@@ -1,26 +1,19 @@
 import { PrismaClient } from '@prisma/client'
 
-// Singleton Prisma optimisé pour Vercel Serverless
-let prisma: PrismaClient
+// Configuration Prisma optimisée pour Vercel Serverless
+const globalForPrisma = global as unknown as { prisma: PrismaClient }
 
-declare global {
-  // eslint-disable-next-line no-var
-  var __prisma: PrismaClient | undefined
-}
-
-if (process.env.NODE_ENV === 'production') {
-  // En production (Vercel), nouvelle instance à chaque invocation
-  prisma = new PrismaClient({
-    log: ['error']
-  })
-} else {
-  // En dev, réutilise l'instance globale
-  if (!global.__prisma) {
-    global.__prisma = new PrismaClient({
-      log: ['query', 'error', 'warn']
-    })
+export const prisma = globalForPrisma.prisma || new PrismaClient({
+  log: process.env.NODE_ENV === 'development' ? ['query', 'error', 'warn'] : ['error'],
+  datasources: {
+    db: {
+      url: process.env.DATABASE_URL
+    }
   }
-  prisma = global.__prisma
+})
+
+if (process.env.NODE_ENV !== 'production') {
+  globalForPrisma.prisma = prisma
 }
 
 export default prisma
