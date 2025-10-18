@@ -101,11 +101,11 @@ export default defineNuxtConfig({
     preset: 'vercel',
     serveStatic: true,
     moduleSideEffects: ['@prisma/client'],
-    rollupConfig: {
-      external: [],
-      output: {
-        format: 'esm'
-      }
+    externals: {
+      inline: ['@prisma/client', '.prisma/client', '@prisma/engines']
+    },
+    alias: {
+      '.prisma/client/index-browser': '@prisma/client/index-browser'
     }
   },
 
