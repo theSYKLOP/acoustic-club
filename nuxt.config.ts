@@ -98,15 +98,7 @@ export default defineNuxtConfig({
 
   // Nitro (serveur)
   nitro: {
-    preset: 'vercel',
-    serveStatic: true,
-    moduleSideEffects: ['@prisma/client'],
-    externals: {
-      inline: ['@prisma/client', '.prisma/client', '@prisma/engines']
-    },
-    alias: {
-      '.prisma/client/index-browser': '@prisma/client/index-browser'
-    }
+    preset: 'node-server'
   },
 
   // Optimizations
