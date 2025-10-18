@@ -1,16 +1,10 @@
 import { defineNitroConfig } from 'nitropack/config'
 
 export default defineNitroConfig({
-  // Externaliser Prisma pour éviter les erreurs de bundling
+  preset: 'vercel',
+  // Inline Prisma pour Vercel serverless
   externals: {
-    inline: [
-      // Forcer l'inline de certains packages
-    ],
-    external: [
-      // Externaliser Prisma
-      '@prisma/client',
-      '.prisma/client'
-    ]
+    inline: [/@prisma/]
   },
   
   // Configuration pour les modules qui ont des effets de bord

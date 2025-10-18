@@ -1,1 +1,10 @@
-{}
+{
+  "framework": "nuxtjs",
+  "buildCommand": "npm run build",
+  "functions": {
+    "**/*.func/**": {
+      "memory": 1024,
+      "maxDuration": 10
+    }
+  }
+}

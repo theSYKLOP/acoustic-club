@@ -100,8 +100,12 @@ export default defineNuxtConfig({
   nitro: {
     preset: 'vercel',
     serveStatic: true,
-    externals: {
-      inline: ['@prisma/client', '@prisma/client/runtime/library', '.prisma/client', '.prisma']
+    moduleSideEffects: ['@prisma/client'],
+    rollupConfig: {
+      external: [],
+      output: {
+        format: 'esm'
+      }
     }
   },
 

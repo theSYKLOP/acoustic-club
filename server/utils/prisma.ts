@@ -1,20 +1,26 @@
 import { PrismaClient } from '@prisma/client'
 
-// Singleton pour Prisma Client (évite les connexions multiples en dev)
-const prismaClientSingleton = () => {
-  return new PrismaClient({
-    log: process.env.NODE_ENV === 'development' ? ['query', 'error', 'warn'] : ['error'],
-  })
-}
+// Singleton Prisma optimisé pour Vercel Serverless
+let prisma: PrismaClient
 
 declare global {
-  var prisma: undefined | ReturnType<typeof prismaClientSingleton>
+  // eslint-disable-next-line no-var
+  var __prisma: PrismaClient | undefined
 }
 
-const prisma = globalThis.prisma ?? prismaClientSingleton()
-
-if (process.env.NODE_ENV !== 'production') {
-  globalThis.prisma = prisma
+if (process.env.NODE_ENV === 'production') {
+  // En production (Vercel), nouvelle instance à chaque invocation
+  prisma = new PrismaClient({
+    log: ['error']
+  })
+} else {
+  // En dev, réutilise l'instance globale
+  if (!global.__prisma) {
+    global.__prisma = new PrismaClient({
+      log: ['query', 'error', 'warn']
+    })
+  }
+  prisma = global.__prisma
 }
 
 export default prisma
